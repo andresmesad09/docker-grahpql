@@ -13,6 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # This is a special setting that tells the checkout action to fetch the complete Git history. By default, GitHub Actions only fetches the latest commit to save time and space. Setting fetch-depth: 0 is like saying "I want all the commits, not just the latest one."
+    
+    - name: Docker Login
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        echo "Init login"
+        docker loging -u $DOCKER_USER -p $DOCKER_PASSWORD
+        echo "End login"
+    # - name: Build the Docker image
+    #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
