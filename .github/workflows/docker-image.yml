@@ -17,18 +17,32 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0 # This is a special setting that tells the checkout action to fetch the complete Git history. By default, GitHub Actions only fetches the latest commit to save time and space. Setting fetch-depth: 0 is like saying "I want all the commits, not just the latest one."
-    
+
+    - name: Git Semantic Version
+      uses: PaulHatch/semantic-version@v4.0.3
+      with:
+        # if "major: is present in commit"
+        major_pattern: "major:"
+        minor_pattern: "feat:"
+        # A string to determine the format of the version output
+        format: "${major}.${minor}.${patch}-prerelease${increment}"
+      # id of step
+      id: version
+        
     - name: Docker Login
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        NEW_VERSION: ${{ steps.version.outputs.version }}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        echo "New version: $NEW_VERSION!!!"
+
+
+    # - name: Buld Docker image
+    #   run: |
+    #     docker build -t andresmesad09/docker-graphql:0.0.1 .
     
-    - name: Buld Docker image
-      run: |
-        docker build -t andresmesad09/docker-graphql:0.0.1 .
-    
-    - name: Push Docker image
-      run: |
-        docker push andresmesad09/docker-graphql:0.0.1
+    # - name: Push Docker image
+    #   run: |
+    #     docker push andresmesad09/docker-graphql:0.0.1
